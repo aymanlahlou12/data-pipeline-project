@@ -10,3 +10,13 @@ CREATE TABLE IF NOT EXISTS staging_weather (
     reading_time VARCHAR(50),
     extracted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+
+
+
+
+
+
+
+SELECT * FROM weather_etl.staging_weather;

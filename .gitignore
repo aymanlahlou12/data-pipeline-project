@@ -1,1 +1,8 @@
 de_env/
+logs/
+plugins/
+dags/__pycache__/
+raw/
+processed/
+docker-compose.yaml
+.env

@@ -3,8 +3,8 @@ import json
 import os 
 from sqlalchemy import create_engine
 
-raw_files = [f for f in os.listdir('raw') if f.endswith('.json')]
-latest_file = f"raw/{sorted(raw_files)[-1]}"
+raw_files = [f for f in os.listdir('/opt/airflow/raw') if f.endswith('.json')]
+latest_file = f"/opt/airflow/raw/{sorted(raw_files)[-1]}"
 with open(latest_file,'r') as file:
     data = json.load(file)
 
@@ -18,6 +18,6 @@ df = pd.DataFrame([{
 }])
 print("Data transformed successfully :"),print(df)
 
-engine = create_engine('mysql+pymysql://root:zikovitch123@localhost:3306/weather_etl')
+engine = create_engine('mysql+pymysql://root:zikovitch123@host.docker.internal:3306/weather_etl')
 df.to_sql('staging_weather',con=engine, if_exists='append', index=False)
 print("Data loaded to staging successfully.")

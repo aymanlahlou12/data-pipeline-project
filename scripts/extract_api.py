@@ -8,7 +8,7 @@ response = requests.get(url)
 raw_data = response.json()
 
 today = datetime.now().strftime("%Y_%m_%d")
-filename = f"raw/weather_{today}.json"
+filename = f"/opt/airflow/raw/weather_{today}.json"
 
 with open (filename, "w") as file:
     json.dump(raw_data, file, indent = 4)

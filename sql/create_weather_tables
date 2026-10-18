@@ -1,0 +1,12 @@
+CREATE DATABASE IF NOT EXISTS weather_etl;
+USE weather_etl;
+
+CREATE TABLE IF NOT EXISTS fact_weather (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    latitude DECIMAL(10, 4),
+    longitude DECIMAL(10, 4),
+    temperature DECIMAL(5, 2),
+    windspeed DECIMAL(5, 2),
+    reading_time TIMESTAMP,
+    spark_processed_at TIMESTAMP
+);

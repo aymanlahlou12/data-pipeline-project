@@ -35,4 +35,9 @@ with DAG(
         bash_command='python /opt/airflow/scripts/transform_spark.py'
     )
 
-    extract_task >> load_staging_task >> transform_spark_task
+    load_to_warehouse = BashOperator(
+        task_id='load_to_warehouse',
+        bash_command='python /opt/airflow/scripts/load_to_warehouse.py'
+    ) 
+
+    extract_task >> load_staging_task >> transform_spark_task >> load_to_warehouse

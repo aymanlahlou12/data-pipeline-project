@@ -4,7 +4,8 @@ from datetime import datetime
 
 url = "https://api.open-meteo.com/v1/forecast?latitude=32.30&longitude=-9.23&current_weather=true"
 
-response = requests.get(url)
+response = requests.get(url, timeout=30)
+response.raise_for_status()
 raw_data = response.json()
 
 today = datetime.now().strftime("%Y_%m_%d")

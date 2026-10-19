@@ -1,40 +1,24 @@
 USE weather_etl;
 
-CREATE TABLE IF NOT EXISTS dim_location(
+CREATE TABLE IF NOT EXISTS dim_location (
     location_id INT AUTO_INCREMENT PRIMARY KEY,
-    latitude FLOAT,
-    longitude FLOAT,
-    UNIQUE(latitude, longitude)
+    latitude FLOAT NOT NULL,
+    longitude FLOAT NOT NULL,
+    UNIQUE KEY uq_dim_location_coordinates (latitude, longitude)
 );
 
-CREATE TABLE IF NOT EXISTS dim_time(
+CREATE TABLE IF NOT EXISTS dim_time (
     time_id INT AUTO_INCREMENT PRIMARY KEY,
-    reading_time VARCHAR(50) UNIQUE
+    reading_time VARCHAR(50) NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS fact_weather (
     fact_id INT AUTO_INCREMENT PRIMARY KEY,
-    location_id INT,
-    time_id INT,
+    location_id INT NOT NULL,
+    time_id INT NOT NULL,
     temperature FLOAT,
     windspeed FLOAT,
+    UNIQUE KEY uq_fact_weather_location_time (location_id, time_id),
     FOREIGN KEY (location_id) REFERENCES dim_location(location_id),
     FOREIGN KEY (time_id) REFERENCES dim_time(time_id)
 );
-
-
-INSERT IGNORE INTO dim_location (latitude, longitude)
-SELECT DISTINCT latitude, longitude FROM staging_weather;
-
-INSERT IGNORE INTO dim_time (reading_time)
-SELECT DISTINCT reading_time FROM staging_weather;
-
-INSERT INTO fact_weather (location_id, time_id, temperature, windspeed)
-SELECT 
-    l.location_id,
-    t.time_id,
-    s.temperature,
-    s.windspeed
-FROM staging_weather s
-JOIN dim_location l ON s.latitude = l.latitude AND s.longitude = l.longitude
-JOIN dim_time t ON s.reading_time = t.reading_time;

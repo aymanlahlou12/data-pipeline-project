@@ -8,15 +8,6 @@ CREATE TABLE IF NOT EXISTS staging_weather (
     temperature FLOAT,
     windspeed FLOAT,
     reading_time VARCHAR(50),
-    extracted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    extracted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_staging_weather_reading (latitude, longitude, reading_time)
 );
-
-
-
-
-
-
-
-
-
-SELECT * FROM weather_etl.staging_weather;

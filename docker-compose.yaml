@@ -1,0 +1,50 @@
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Copy .env.example to .env and set MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-weather_etl}
+      MYSQL_USER: ${MYSQL_USER:-weather_app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Copy .env.example to .env and set MYSQL_PASSWORD}
+    ports:
+      - "127.0.0.1:${MYSQL_HOST_PORT:-3306}:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./sql/01_create_tables.sql:/docker-entrypoint-initdb.d/01_create_tables.sql:ro
+      - ./sql/02_star_schema.sql:/docker-entrypoint-initdb.d/02_star_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  airflow:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    user: "${AIRFLOW_UID:-50000}:0"
+    command: standalone
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      MYSQL_HOST: mysql
+      MYSQL_PORT: "3306"
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-weather_etl}
+      MYSQL_USER: ${MYSQL_USER:-weather_app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Copy .env.example to .env and set MYSQL_PASSWORD}
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - airflow-data:/opt/airflow
+      - ./dags:/opt/airflow/dags:ro
+      - ./scripts:/opt/airflow/scripts:ro
+      - ./raw:/opt/airflow/raw
+      - ./processed:/opt/airflow/processed
+
+volumes:
+  airflow-data:
+  mysql-data:
